@@ -1,0 +1,195 @@
+swagger: '2.0'
+info:
+  description: |
+    This is a sample Car Show Room server.  
+    
+  version: 1.0.0
+  title: Car Show Room
+  
+  contact:
+    email: test@test.io
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+    
+# host: localhost
+# basePath: /v1
+
+tags:
+- name: car
+  description: Everything about the cars
+  externalDocs:
+    description: Find out more
+    url: http://www.dummyshowroom.com
+
+# schemes:
+# - http
+
+paths:
+  /car:
+    
+    post:
+      tags:
+      - car
+      summary: Add a new car to the showroom
+      operationId: addCar
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      parameters:
+      - in: body
+        name: body
+        description: Car object that needs to be added to the showroom
+        required: true
+        schema:
+          $ref: '#/definitions/Car'
+      responses:
+        405:
+          description: Invalid input
+    
+    
+    put:
+      tags:
+      - car
+      summary: Update an existing car
+      operationId: updateCar
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      parameters:
+      - in: body
+        name: body
+        description: Car object that needs to be updated to the store
+        required: true
+        schema:
+          $ref: '#/definitions/Car'
+      responses:
+        400:
+          description: Invalid ID supplied
+        404:
+          description: Car not found
+        405:
+          description: Validation exception
+
+        
+  /car/findByStatus:
+    get:
+      tags:
+      - car
+      summary: Finds cars by status
+      operationId: findCarsByStatus
+      produces:
+      - application/json
+      parameters:
+      - name: status
+        in: query
+        required: true
+        type: array
+        items:
+          type: string
+          enum:
+          - available
+          - sold
+          default: available
+        collectionFormat: multi
+      responses:
+        200:
+          description: successful operation
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Car'
+        400:
+          description: Invalid status value
+        
+
+      
+  /car/{carNumber}:
+    get:
+      tags:
+      - car
+      summary: Find car by number
+      description: Returns a single car
+      operationId: getCarByNumber
+      produces:
+      - application/json
+      parameters:
+      - name: carNumber
+        in: path
+        description: ID of car to return
+        required: true
+        type: integer
+        format: int64
+      responses:
+        200:
+          description: successful operation
+          schema:
+            $ref: '#/definitions/Car'
+        400:
+          description: Invalid Car Number supplied
+        404:
+          description: Car not found
+   
+    delete:
+      tags:
+      - car
+      summary: Deletes a Car from Showroom
+      operationId: deleteCar
+      produces:
+      - application/json
+      parameters:
+      - name: carNumber
+        in: path
+        description: Car Number to delete
+        required: true
+        type: integer
+        format: int64
+      responses:
+        400:
+          description: Invalid Car Number supplied
+        404:
+          description: Car not found
+      
+
+definitions:
+
+  Car:
+    type: object
+    required:
+    - carNumber
+    - category
+    
+    properties:
+      
+      carNumber:
+        type: integer
+        format: int64
+        
+      category:
+        $ref: '#/definitions/Category'
+
+      status:
+        type: string
+        description: Car status in the Show Room
+        enum:
+        - available
+        - sold
+
+  Category:
+    type: object
+    required:
+    - make
+    - model
+    properties:
+      make:
+        type: string
+      model:
+        type: string
+
+
+host: localhost:8050
+basePath: /v1/showroom
+schemes:
+ - http
